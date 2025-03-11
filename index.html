@@ -91,6 +91,8 @@
         </div>
         <button onclick="connectDevice()">Connect to Device</button>
     </div>
+    <!-- New section for MAC address display -->
+    <div id="macAddress" style="margin-top: 20px;">MAC Address: <span id="mac">Not connected</span></div>
 
     <script>
         let device;
@@ -102,17 +104,23 @@
 
         async function connectDevice() {
             try {
-                device = await navigator.bluetooth.requestDevice({
+                const permission = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
                     optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb']
                 });
-                server = await device.gatt.connect();
-                service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
-                characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+                if (permission) {
+                    device = await permission;
+                    server = await device.gatt.connect();
+                    service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+                    characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
 
-                characteristic.startNotifications();
-                characteristic.addEventListener('characteristicvaluechanged', handleMessage);
-                alert('Connected!');
+                    characteristic.startNotifications();
+                    characteristic.addEventListener('characteristicvaluechanged', handleMessage);
+                    document.getElementById('mac').innerText = device.id;
+                    alert('Connected!');
+                } else {
+                    alert('Bluetooth permission denied');
+                }
             } catch (error) {
                 console.error('Error connecting to device:', error);
             }
