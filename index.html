@@ -62,6 +62,11 @@
             <input type="text" id="messageInput" placeholder="Type a message...">
             <button onclick="sendMessage()">Send</button>
         </div>
+        <div>
+            <input type="text" id="deviceNameInput" placeholder="Enter your device name">
+            <input type="color" id="nameColorPicker">
+            <button onclick="setDeviceName()">Set Device Name</button>
+        </div>
         <button onclick="connectDevice()">Connect to Device</button>
     </div>
 
@@ -70,6 +75,8 @@
         let server;
         let service;
         let characteristic;
+        let deviceName = 'You';
+        let nameColor = '#000000';
 
         async function connectDevice() {
             try {
@@ -107,7 +114,7 @@
             const messages = document.getElementById('messages');
             const messageElement = document.createElement('div');
             messageElement.className = 'message';
-            messageElement.innerHTML = `<p><strong>You:</strong> ${message}</p>`;
+            messageElement.innerHTML = `<p><strong style="color: ${nameColor};">${deviceName}:</strong> ${message}</p>`;
             messages.appendChild(messageElement);
             messages.scrollTop = messages.scrollHeight;
 
@@ -115,6 +122,15 @@
             const data = encoder.encode(message);
             await characteristic.writeValue(data);
             input.value = '';
+        }
+
+        function setDeviceName() {
+            const nameInput = document.getElementById('deviceNameInput');
+            deviceName = nameInput.value || 'You';
+            const colorPicker = document.getElementById('nameColorPicker');
+            nameColor = colorPicker.value || '#000000';
+            nameInput.value = '';
+            alert(`Device name set to: ${deviceName} with color ${nameColor}`);
         }
     </script>
 </body>
