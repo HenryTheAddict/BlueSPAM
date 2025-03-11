@@ -13,6 +13,7 @@
             justify-content: center;
             height: 100vh;
             background-color: #f4f4f4;
+            color: #000;
         }
         .chat-container {
             width: 80%;
@@ -53,11 +54,32 @@
             border-radius: 0 5px 5px 0;
             cursor: pointer;
         }
+        .no-chats {
+            text-align: center;
+            color: #888;
+        }
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #fff;
+            }
+            .chat-container {
+                background-color: #1e1e1e;
+            }
+            .messages {
+                border: 1px solid #444;
+            }
+            .input-container input {
+                border: 1px solid #444;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div class="messages" id="messages"></div>
+        <div class="messages" id="messages">
+            <div class="no-chats">No chats here</div>
+        </div>
         <div class="input-container">
             <input type="text" id="messageInput" placeholder="Type a message...">
             <button onclick="sendMessage()">Send</button>
@@ -104,6 +126,8 @@
             messageElement.innerHTML = `<p><strong>Device:</strong> ${value}</p>`;
             messages.appendChild(messageElement);
             messages.scrollTop = messages.scrollHeight;
+
+            checkEmptyMessages();
         }
 
         async function sendMessage() {
@@ -122,6 +146,8 @@
             const data = encoder.encode(message);
             await characteristic.writeValue(data);
             input.value = '';
+
+            checkEmptyMessages();
         }
 
         function setDeviceName() {
@@ -132,6 +158,18 @@
             nameInput.value = '';
             alert(`Device name set to: ${deviceName} with color ${nameColor}`);
         }
+
+        function checkEmptyMessages() {
+            const messages = document.getElementById('messages');
+            const noChats = document.querySelector('.no-chats');
+            if (messages.children.length === 1) {
+                noChats.style.display = 'block';
+            } else {
+                noChats.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkEmptyMessages);
     </script>
 </body>
 </html>
